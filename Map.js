@@ -29,6 +29,22 @@ function Map( settings=false ){
             floor( player.pos.x / this.settings.size ),
             floor( player.pos.y / this.settings.size )
         ) 
+        let playerAngle = player.angleVision
+
+        while( playerAngle > 2*PI ){
+            playerAngle -= 2*PI
+        }
+        while( playerAngle < 0 ){
+            playerAngle += 2*PI
+        }
+        
+        let closest = { angle: Infinity }
+        targetOptions( playerPos ).forEach( op => {
+            let deltaOp = abs(op.angle - playerAngle)  
+            let deltaC = abs(closest.angle - playerAngle)
+            closest = deltaOp < deltaC ? op : closest
+        } )
+
         let asciiText = sep + '<br>'
 
         this.matrix.forEach( (row, i) => {
@@ -37,6 +53,8 @@ function Map( settings=false ){
                 let newChar
                 if( i == playerPos.y && j == playerPos.x){
                    newChar = 'o' 
+                } else if( i == closest.pos.y && j == closest.pos.x ) {
+                   newChar = closest.char 
                 } else {
                     newChar = this.matrixChars[sp].repeat( this.matrixSize ) 
                 }
